@@ -1,8 +1,11 @@
 
+import { NavigationBar } from '@/components/navigation-bar';
 
 const ChatPage=()=>{
     return (
-        <div>ChatPage </div>
+        <><NavigationBar trigger= {<> </> }/> 
+        
+        </>
 
     )
 }
