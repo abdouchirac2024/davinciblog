@@ -2,9 +2,8 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import '@/styles/globals.css';
 import { ThemeProvider } from '@/providers/theme-provider';
-
-
-
+import {TooltipProvider} from "@/components/ui/tooltip";
+import { Toaster } from "@/components/ui/sonner";
 
 
 
@@ -29,7 +28,10 @@ export default function RootLayout({
          enableSystem
          disableTransitionOnChange
           >
+            <TooltipProvider>
            <main> {children}</main>
+           </TooltipProvider>
+           <Toaster richColors/>
           </ThemeProvider>
       </body>
     </html>
