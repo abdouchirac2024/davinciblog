@@ -21,6 +21,9 @@ import { Separator } from '@/components/ui/separator';
 import { Button } from '@/components/ui/button';
 import { useForm } from 'react-hook-form';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { useQuery } from 'convex/react';
+import { api } from '../../convex/_generated/api';
+import { useUser,UserButton } from '@clerk/clerk-react';
 
 const statuses = [
   '👋 Speak Freely',
@@ -40,6 +43,12 @@ const ProfileDialogContent = () => {
 
   const { setTheme } = useTheme();
 
+  const { user } = useUser();
+
+  const userDetails = useQuery(api.status.get, { clerkId: user?.id! });
+  
+
+
   const form = useForm<z.infer<typeof addFriendFormSchema>>({
     resolver: zodResolver(addFriendFormSchema),
     defaultValues: {
@@ -57,18 +66,18 @@ const ProfileDialogContent = () => {
         <CardTitle>Profile</CardTitle>
         <div>
           <Avatar className='h-20 w-20 mx-auto'>
-            <AvatarImage src='https://github.com/shadcn.png' />
-            <AvatarFallback>User</AvatarFallback>
+            <AvatarImage src={userDetails?.imageUrl} />
+            <AvatarFallback>{userDetails?.username[0]}</AvatarFallback>
           </Avatar>
         </div>
       </Card>
       <div className='flex flex-col gap-y-6 mt-4'>
-        <div className='flex items-center space-x-2'>
+      <div className='flex items-center space-x-2'>
           <UserRound />
           <Input
             disabled
             placeholder='Name'
-            value={'USER NAME'}
+            value={userDetails?.username}
             className='border-none outline-none ring-0'
           />
         </div>
@@ -76,8 +85,18 @@ const ProfileDialogContent = () => {
         <Separator />
         <div className='flex items-center justify-center space-x-5'>
           <p>Manage your account</p>
-          <button>USER BUTTON</button>
+          <UserButton
+            appearance={{
+              elements: {
+                userButtonPopoverCard: {
+                  pointerEvents: 'initial',
+                },
+              },
+            }}
+          />
         </div>
+
+
         <Separator />
         <Dialog>
           <DialogTrigger>
@@ -85,6 +104,7 @@ const ProfileDialogContent = () => {
               <UserRoundSearch />
               <p> Send friend request</p>
             </div>
+
           </DialogTrigger>
 
           <DialogContent>
@@ -138,12 +158,12 @@ const ProfileDialogContent = () => {
           <DialogTrigger>
             <div className='flex items-center space-x-2'>
               <Pencil />
-              <p>Display current status</p>
+              <p>{userDetails?.status}</p>
             </div>
           </DialogTrigger>
           <DialogContent>
             <Textarea
-              placeholder='Display current status'
+              placeholder={userDetails?.status}
               className='resize-none h-48'
               value={status}
               onChange={(e) => setStatus(e.target.value)}
